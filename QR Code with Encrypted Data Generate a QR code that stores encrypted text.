@@ -1,0 +1,66 @@
+# Install dependencies (only once per runtime)
+!pip install cryptography qrcode[pil] opencv-python pillow
+
+import base64, os, json
+import qrcode
+import cv2
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.fernet import Fernet
+from PIL import Image
+from IPython.display import Image as ColabImage, display
+
+# --- Crypto helpers ---
+def derive_key(password: str, salt: bytes) -> bytes:
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=200_000,
+        backend=default_backend(),
+    )
+    return base64.urlsafe_b64encode(kdf.derive(password.encode()))
+
+def encrypt_text(text: str, password: str) -> str:
+    salt = os.urandom(16)
+    key = derive_key(password, salt)
+    token = Fernet(key).encrypt(text.encode())
+    package = {
+        "s": base64.b64encode(salt).decode(),
+        "t": token.decode()
+    }
+    return base64.urlsafe_b64encode(json.dumps(package).encode()).decode()
+
+def decrypt_text(payload_b64: str, password: str) -> str:
+    package = json.loads(base64.urlsafe_b64decode(payload_b64).decode())
+    salt = base64.b64decode(package["s"])
+    token = package["t"].encode()
+    key = derive_key(password, salt)
+    return Fernet(key).decrypt(token).decode()
+
+# --- QR helpers ---
+def make_qr(data: str, filename: str):
+    img = qrcode.make(data)
+    img.save(filename)
+    print(f"✅ QR code saved as {filename}")
+    display(ColabImage(filename))  # Show QR inside Colab
+
+def read_qr(filename: str) -> str:
+    img = cv2.imread(filename)
+    detector = cv2.QRCodeDetector()
+    data, _, _ = detector.detectAndDecode(img)
+    return data
+
+# --- Demo run ---
+secret = "This is Harsh's encrypted QR code 🔐"
+password = "myStrongPass123"
+
+# Encrypt and generate QR
+encrypted_payload = encrypt_text(secret, password)
+make_qr(encrypted_payload, "secret.png")
+
+# Decode and decrypt
+scanned_payload = read_qr("secret.png")
+decrypted_text = decrypt_text(scanned_payload, password)
+print("🔓 Decrypted text:", decrypted_text)
