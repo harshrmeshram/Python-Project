@@ -1,0 +1,21 @@
+# Grocery Store Discount Program
+
+# Taking input
+amount = float(input("Enter total bill amount: ₹"))
+
+# Applying discount logic
+if amount < 1000:
+    discount = amount * 0.05
+elif amount >= 1000 and amount <= 5000:
+    discount = amount * 0.10
+else:
+    discount = amount * 0.15
+
+# Final bill calculation
+final_amount = amount - discount
+
+# Output
+print("\n----- BILL DETAILS -----")
+print("Original Amount: ₹", amount)
+print("Discount Applied: ₹", discount)
+print("Final Amount to Pay: ₹", final_amount)
