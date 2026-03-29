@@ -1,0 +1,22 @@
+
+def weight_on_planets(earth_weight):
+    gravity = {
+        "Mercury": 0.38,
+        "Venus": 0.91,
+        "Earth": 1.00,
+        "Mars": 0.38,
+        "Jupiter": 2.34,
+        "Saturn": 1.06,
+        "Uranus": 0.92,
+        "Neptune": 1.19
+    }
+
+    print("\nYour weight on different planets:\n")
+    
+    for planet, g in gravity.items():
+        new_weight = earth_weight * g
+        print(f"{planet}: {new_weight:.2f} kg")
+
+# Input
+weight = float(input("Enter your weight on Earth (kg): "))
+weight_on_planets(weight)
