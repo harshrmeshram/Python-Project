@@ -1,0 +1,41 @@
+from datetime import datetime
+
+def age_calculator(year, month, day):
+    birth_date = datetime(year, month, day)
+    now = datetime.now()
+
+    # Total time difference
+    delta = now - birth_date
+
+    # Calculations
+    total_seconds = int(delta.total_seconds())
+    total_minutes = total_seconds // 60
+    total_hours = total_minutes // 60
+    total_days = delta.days
+    total_weeks = total_days // 7
+
+    years = total_days // 365
+    months = years * 12 + ((total_days % 365) // 30)
+
+    return {
+        "Years": years,
+        "Months": months,
+        "Weeks": total_weeks,
+        "Days": total_days,
+        "Hours": total_hours,
+        "Minutes": total_minutes,
+        "Seconds": total_seconds
+    }
+
+
+print("🎂 ADVANCED AGE CALCULATOR\n")
+
+year = int(input("Enter birth year (YYYY): "))
+month = int(input("Enter birth month (MM): "))
+day = int(input("Enter birth day (DD): "))
+
+age = age_calculator(year, month, day)
+
+print("\n✅ YOUR AGE IS:\n")
+for key, value in age.items():
+    print(f"{key}: {value}")
